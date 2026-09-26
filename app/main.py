@@ -6,7 +6,7 @@ app = FastAPI(title="DevOps Task Manager")
 
 def get_db_connection():
     return psycopg2.connect(
-        host="db",
+      host="devops-db",
         database="devopsdb",
         user="devops",
         password="devops123"
