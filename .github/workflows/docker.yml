@@ -26,4 +26,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: ${{ secrets.DOCKERHUB_USERNAME }}/cloud-native-devops-platform:latest
+          tags: pravesh880082/cloud-native-devops-platform:latest
