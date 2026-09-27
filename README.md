@@ -496,41 +496,7 @@ Automated health checks verify that the deployed application is responding corre
 
 ---
 
-# 🖥️ Screenshots
 
-Add screenshots here after uploading them to the repository.
-
-### Application
-
-```text
-![Application](screenshots/application.png)
-```
-
-### FastAPI Swagger
-
-```text
-![Swagger](screenshots/swagger.png)
-```
-
-### GitHub Actions
-
-```text
-![GitHub Actions](screenshots/github-actions.png)
-```
-
-### Docker Hub
-
-```text
-![Docker Hub](screenshots/docker-hub.png)
-```
-
-### AWS EC2
-
-```text
-![AWS EC2](screenshots/aws-ec2.png)
-```
-
----
 
 # 🚀 How to Run the Project
 
