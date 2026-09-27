@@ -1,4 +1,4 @@
-name: Deploy to EC2
+             name: Deploy to EC2
 
 on:
   workflow_run:
@@ -19,11 +19,52 @@ jobs:
           username: ${{ secrets.EC2_USERNAME }}
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
+            sudo docker network create devops-network || true
+            sudo docker volume create devops-postgres-data
             sudo docker pull pravesh880082/cloud-native-devops-platform:latest
+            sudo docker rm -f devops-db || true
             sudo docker rm -f devops-app || true
+            sudo docker run -d \
+              --name devops-db \
+              --network devops-network \
+              --restart unless-stopped \
+              -e POSTGRES_USER=devops \
+              -e POSTGRES_PASSWORD=devops123 \
+              -e POSTGRES_DB=devopsdb \
+              -v devops-postgres-data:/var/lib/postgresql/data \
+              postgres:16
+            for i in $(seq 1 30); do
+              if sudo docker exec devops-db pg_isready -U devops -d devopsdb >/dev/null 2>&1; then
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                sudo docker logs devops-db
+                exit 1
+              fi
+              sleep 2
+            done
             sudo docker run -d \
               --name devops-app \
               --network devops-network \
+              --restart unless-stopped \
+              -e DB_HOST=devops-db \
+              -e DB_PORT=5432 \
+              -e DB_NAME=devopsdb \
+              -e DB_USER=devops \
+              -e DB_PASSWORD=devops123 \
               -p 8000:8000 \
               pravesh880082/cloud-native-devops-platform:latest
-            sudo docker ps
+            for i in $(seq 1 30); do
+              if curl --fail --silent http://localhost:8000/health >/dev/null; then
+                break
+              fi
+              if [ "$i" -eq 30 ]; then
+                sudo docker logs devops-app
+                exit 1
+              fi
+              sleep 2
+            done
+            sudo docker ps --filter name=devops-
+            curl --fail http://localhost:8000/
+            curl --fail http://localhost:8000/health
+            echo "Deployment successful!"
